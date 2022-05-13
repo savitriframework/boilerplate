@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@savitri/backend": "^1.0.1",
+    "@savitri/common": "^1.0.1",
+    "@savitri/components": "^1.0.5",
+    "@savitri/frontend": "^1.0.94"
+  }
+}

@@ -8,5 +8,4 @@ COPY etc/nginx /etc/nginx/
 COPY frontend /var/www/html/frontend/
 
 RUN npm install
-CMD (cd node_modules/savitri/packages/frontend && npm install) && \
-  (cd node_modules/savitri && npm install)
+CMD (cd node_modules/\@savitri/frontend && npm install)
