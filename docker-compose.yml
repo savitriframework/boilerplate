@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  install:
+    profiles: ["install"]
+    build:
+      context: ./
+    volumes:
+      - base:/opt/application
+      - www:/var/www/html
+      - nginx-config:/etc/nginx
+
+  backend:
+    profiles: ["backend"]
+    restart: always
+    build:
+      context: packages/backend
+    env_file:
+      - packages/backend/.prod.env
+    volumes:
+      - base:/opt/application
+      - nginx-config:/etc/nginx
+      - /data/storage:/data/storage
+    networks:
+      backend-network:
+        ipv4_address: 192.168.0.101
+
+  frontend:
+    profiles: ["frontend"]
+    build:
+      context: packages/frontend
+    volumes:
+      - base:/opt/application
+      - www:/var/www/html
+      - nginx-config:/etc/nginx
+
+  mongo:
+    profiles: ["backend"]
+    image: mongo:latest
+    restart: always
+    networks:
+      backend-network:
+        ipv4_address: 192.168.0.90
+    volumes:
+      - /data/db:/data/db
+
+  nginx:
+    profiles: ["backend"]
+    image: nginx
+    restart: always
+    volumes:
+      - www:/var/www/html
+      - nginx-config:/etc/nginx
+    ports:
+      - '80:80'
+    networks:
+      - backend-network
+
+volumes:
+  www:
+  base:
+  nginx-config:
+
+networks:
+  backend-network:
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.0.0/16
