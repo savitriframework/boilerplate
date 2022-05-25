@@ -16,7 +16,7 @@ services:
     build:
       context: packages/backend
     env_file:
-      - packages/backend/.prod.env
+      - packages/backend/production.env
     volumes:
       - base:/opt/application
       - nginx-config:/etc/nginx
