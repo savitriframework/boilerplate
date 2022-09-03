@@ -5,7 +5,6 @@ WORKDIR /opt/application
 COPY packages packages
 COPY package.json package.json
 COPY etc/nginx /etc/nginx/
-COPY frontend /var/www/html/frontend/
+COPY etc/crontabs /etc/crontabs-postup/
 
 RUN npm install
-CMD (cd node_modules/\@savitri/frontend && npm install)

@@ -2,68 +2,83 @@ version: '3.8'
 
 services:
   install:
-    profiles: ["install"]
     build:
       context: ./
     volumes:
       - base:/opt/application
       - www:/var/www/html
       - nginx-config:/etc/nginx
+      - crontabs-postup:/etc/crontabs-postup
 
-  backend:
-    profiles: ["backend"]
+  api:
     restart: always
     build:
-      context: packages/backend
+      context: packages/api
     env_file:
-      - packages/backend/production.env
+      - packages/api/production.env
     volumes:
       - base:/opt/application
       - nginx-config:/etc/nginx
-      - /data/storage:/data/storage
+      - /data/portal-storage:/data/storage
     networks:
       backend-network:
-        ipv4_address: 192.168.0.101
+        ipv4_address: 10.11.0.100
+    depends_on:
+      install:
+        condition: service_completed_successfully
 
-  frontend:
-    profiles: ["frontend"]
+  web:
     build:
-      context: packages/frontend
+      context: packages/web
     volumes:
       - base:/opt/application
       - www:/var/www/html
       - nginx-config:/etc/nginx
+    depends_on:
+      install:
+        condition: service_completed_successfully
 
   mongo:
-    profiles: ["backend"]
     image: mongo:latest
     restart: always
     networks:
       backend-network:
-        ipv4_address: 192.168.0.90
+        ipv4_address: 10.11.0.90
     volumes:
-      - /data/db:/data/db
+      - /data/portal-db:/data/db
 
   nginx:
-    profiles: ["backend"]
     image: nginx
-    restart: always
     volumes:
       - www:/var/www/html
       - nginx-config:/etc/nginx
     ports:
-      - '80:80'
+      - '8082:80'
     networks:
       - backend-network
+    depends_on:
+      web:
+        condition: service_completed_successfully
+
+  postup:
+    build:
+      context: postup
+    restart: always
+    networks:
+      - backend-network
+    volumes:
+      - /data/portal-backup:/data/backup
+      - crontabs-postup:/etc/crontabs
 
 volumes:
   www:
   base:
   nginx-config:
+  crontabs-postup:
 
 networks:
   backend-network:
     ipam:
       driver: default
       config:
-        - subnet: 192.168.0.0/16
+        - subnet: 10.11.0.0/16
