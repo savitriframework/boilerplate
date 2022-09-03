@@ -1,5 +1,5 @@
 {
-  "extends": "../../node_modules/@savitri/frontend/tsconfig.json",
+  "extends": "../../node_modules/@savitri/web/tsconfig.json",
   "include": [
     "**/*.ts"
   ]
