@@ -49,6 +49,7 @@ services:
 
   nginx:
     image: nginx
+    restart: always
     volumes:
       - www:/var/www/html
       - nginx-config:/etc/nginx
